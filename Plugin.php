@@ -1,11 +1,9 @@
-<?php namespace ToughDeveloper\RicheditorSnippets;
+<?php namespace Inetis\RicheditorSnippets;
 
-use Backend;
-use Event;
 use System\Classes\PluginBase;
 use Backend\FormWidgets\RichEditor;
 use Backend\Classes\Controller;
-use ToughDeveloper\RicheditorSnippets\Classes\SnippetParser;
+use Inetis\RicheditorSnippets\Classes\SnippetParser;
 use RainLab\Pages\Controllers\Index as StaticPage;
 
 /**
@@ -28,9 +26,9 @@ class Plugin extends PluginBase
         return [
             'name'        => 'Richeditor Snippets',
             'description' => 'Adds button to Richeditor toolbar to quickly add Snippets.',
-            'author'      => 'Tough Developer',
+            'author'      => 'Tough Developer & inetis',
             'icon'        => 'icon-newspaper-o',
-            'homepage'    => 'https://github.com/toughdeveloper/oc-richeditorsnippets-plugin'
+            'homepage'    => 'https://github.com/inetis-ch/oc-richeditorsnippets-plugin'
         ];
     }
 
@@ -63,8 +61,8 @@ class Plugin extends PluginBase
             $widget->addJs('/plugins/rainlab/pages/assets/js/pages-snippets.js');
 
             // Adds custom javascript
-            $widget->addJs('/toughdeveloper/snippets/list.js');
-            $widget->addJs('/plugins/toughdeveloper/richeditorsnippets/assets/js/froala.snippets.plugin.js');
+            $widget->addJs('/inetis/snippets/list');
+            $widget->addJs('/plugins/inetis/richeditorsnippets/assets/js/froala.snippets.plugin.js');
         });
     }
 

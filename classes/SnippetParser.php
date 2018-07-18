@@ -1,4 +1,4 @@
-<?php namespace ToughDeveloper\RicheditorSnippets\Classes;
+<?php namespace Inetis\RicheditorSnippets\Classes;
 
 /***
 

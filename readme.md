@@ -50,3 +50,8 @@ html_content:
     toolbarButtons: bold|italic|snippets
     size: huge
 ```
+
+## Contributors
+- Tough Developer: creator of the [original version](https://github.com/toughdeveloper/oc-richeditorsnippets-plugin)
+- inetis
+- [All Contributors](https://github.com/inetis-ch/oc-richeditorsnippets-plugin/graphs/contributors)

@@ -1,13 +1,12 @@
 <?php
 
-use RainLab\Pages\Classes\SnippetManager;
 use Cms\Classes\Theme;
+use RainLab\Pages\Classes\SnippetManager;
 
-Route::get('/toughdeveloper/snippets/list.js', function()
-{
+Route::get('/inetis/snippets/list', function () {
     $user = BackendAuth::getUser();
 
-    if (!BackendAuth::getUser() || !BackendAuth::getUser()->hasAccess('rainlab.pages.access_snippets')) {
+    if (!$user || !$user->hasAccess('rainlab.pages.access_snippets')) {
         return response('Forbidden', 401);
     }
 
@@ -17,14 +16,16 @@ Route::get('/toughdeveloper/snippets/list.js', function()
 
     // Transform to a collection, set the data we need and orgnaise with array keys.
     $snippets = collect($snippets)
-        ->transform(function($item, $key) {
+        ->transform(function ($item, $key) {
             return [
                 'component' => $item->getComponentClass(),
                 'snippet'   => $item->code,
-                'name'      => $item->getName()
+                'name'      => $item->getName(),
             ];
         })
         ->keyBy('snippet');
 
-    return '$.oc.snippets = ' . $snippets;
+    return response('$.oc.snippets = ' . $snippets, 200)
+        ->header('Content-Type', 'application/javascript');
+
 })->middleware('web');

@@ -168,7 +168,8 @@ class SnippetLoader
 	protected static function getMapCacheKey()
     {
 		$theme = Theme::getActiveTheme();
+		$page = CmsController::getController()->getPage();
 
-        return crc32($theme->getPath()).'dynamic-snippet-map';
+        return crc32($theme->getPath() . $page['url']) . '-dynamic-snippet-map';
     }
 }

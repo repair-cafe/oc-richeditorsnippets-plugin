@@ -23,16 +23,13 @@ class SnippetLoader
 		$theme = Theme::getActiveTheme();
 		$controller = CmsController::getController();
 
-		// Get an unique alias for this snippet based on its name and parameters
-		$snippetAlias = uniqid($snippetInfo['code'] . '-' . md5(serialize($snippetInfo['properties'])) . '-');
+		// Make an unique alias for this snippet based on its name and parameters
+		$snippetInfo['code'] = uniqid($snippetInfo['code'] . '-' . md5(serialize($snippetInfo['properties'])) . '-');
 
-		$component = $controller->addComponent($snippetInfo['component'], $snippetAlias, $snippetInfo['properties'], true);
-		self::cacheSnippet($snippetAlias, $snippetInfo);
+		self::attachComponentSnippetToController($snippetInfo, $controller, true);
+		self::cacheSnippet($snippetInfo['code'], $snippetInfo);
 
-		// Trigger the onRun handler to mimic CMS lifecycle
-		$component->onRun();
-
-		return $snippetAlias;
+		return $snippetInfo['code'];
 	}
 
 	/**
@@ -79,23 +76,52 @@ class SnippetLoader
 	{
 		$componentSnippets = self::fetchCachedSnippets();
 
-		$componentManager = ComponentManager::instance();
         foreach ($componentSnippets as $componentInfo) {
-            // Register components for snippet-based components
-            // if they're not defined yet. This is required because
-            // not all snippet components are registered as components,
-            // but it's safe to register them in render-time.
+            self::attachComponentSnippetToController($componentInfo, $cmsController);
+        }
+	}
 
-            if (!$componentManager->hasComponent($componentInfo['component'])) {
-                $componentManager->registerComponent($componentInfo['component'], $componentInfo['code']);
+	/**
+	 * Attach a component-based snippet to a controller.
+	 *
+	 * Register the component if it is not defined yet.
+	 * This is required because not all component snippets are registered as components,
+	 * but it's safe to register them in render-time.
+	 *
+	 * If asked, the run lifecycle events of the component can be run. This is required for
+	 * component that are added late in the page execution like with the twig filter.
+	 *
+	 * @param array $componentInfo
+	 * @param CmsController $controller
+	 * @param bool $triggerRun			Should the run events of the component lifecycle be triggered?
+	 */
+	protected static function attachComponentSnippetToController($componentInfo, CmsController $controller, $triggerRun = false)
+	{
+		$componentManager = ComponentManager::instance();
+
+		if (!$componentManager->hasComponent($componentInfo['component'])) {
+			$componentManager->registerComponent($componentInfo['component'], $componentInfo['code']);
+		}
+
+		$component = $controller->addComponent(
+			$componentInfo['component'],
+			$componentInfo['code'],
+			$componentInfo['properties']
+		);
+
+		if ($triggerRun) {
+			if ($component->fireEvent('component.beforeRun', [], true)) {
+                return;
             }
 
-            $cmsController->addComponent(
-                $componentInfo['component'],
-                $componentInfo['code'],
-                $componentInfo['properties']
-            );
-        }
+            if ($component->onRun()) {
+                return;
+            }
+
+            if ($component->fireEvent('component.run', [], true)) {
+                return;
+			}
+		}
 	}
 
 	/**

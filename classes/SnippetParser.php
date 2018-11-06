@@ -13,41 +13,36 @@ use Cms\Classes\Theme;
 
 class SnippetParser
 {
+    /**
+     * Take a richeditor markup and run snippets contained inside.
+     *
+     * @param string $markup
+     * @return string
+     */
     public static function parse($markup)
     {
         $map = self::extractSnippetsFromMarkup($markup);
-
-        $theme = Theme::getActiveTheme();
         $controller = CmsController::getController();
-        $partialSnippetMap = SnippetManager::instance()->getPartialSnippetMap($theme);
 
         foreach ($map as $snippetDeclaration => $snippetInfo) {
             $snippetCode = $snippetInfo['code'];
 
-            if (!isset($snippetInfo['component'])) {
-                if (!array_key_exists($snippetCode, $partialSnippetMap)) {
-                    throw new ApplicationException(sprintf('Partial for the snippet %s is not found', $snippetCode));
-                }
-
-                $partialName = $partialSnippetMap[$snippetCode];
-                $generatedMarkup = $controller->renderPartial($partialName, $snippetInfo['properties']);
+            if (isset($snippetInfo['component'])) {
+                // The snippet is a component registered as a snippet
+                $snippetAlias = SnippetLoader::registerComponentSnippet($snippetInfo);
+                $generatedMarkup = $controller->renderComponent($snippetAlias);
             }
             else {
-                // If the component was not included in the layout, load it dynamically.
-                // It is required to manually call the onRun method because the CMS is supposed to have ran it when loading the layout.
-                if (!$controller->findComponentByName($snippetCode)) {
-                    $snippetAlias = uniqid($snippetCode . '-');
-
-                    $component = $controller->addComponent($snippetInfo['component'], $snippetAlias, $snippetInfo['properties'], true);
-                    $component->onRun();
-                }
-                
-                $generatedMarkup = $controller->renderComponent($snippetAlias ?? $snippetCode);
+                // The snippet is a partial
+                $partialName = SnippetLoader::registerPartialSnippet($snippetInfo);
+                $generatedMarkup = $controller->renderPartial($partialName, $snippetInfo['properties']);
             }
 
             $pattern = preg_quote($snippetDeclaration);
             $markup = mb_ereg_replace($pattern, $generatedMarkup, $markup);
         }
+
+        SnippetLoader::saveCachedSnippets();
 
         return $markup;
     }

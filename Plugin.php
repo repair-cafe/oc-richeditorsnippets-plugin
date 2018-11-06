@@ -1,10 +1,12 @@
 <?php namespace Inetis\RicheditorSnippets;
 
+use Event;
 use System\Classes\PluginBase;
 use Backend\FormWidgets\RichEditor;
 use Backend\Classes\Controller;
 use Inetis\RicheditorSnippets\Classes\SnippetParser;
 use RainLab\Pages\Controllers\Index as StaticPage;
+use Inetis\RicheditorSnippets\Classes\SnippetLoader;
 
 /**
  * RicheditorSnippets Plugin Information File
@@ -63,6 +65,11 @@ class Plugin extends PluginBase
             // Adds custom javascript
             $widget->addJs('/inetis/snippets/list');
             $widget->addJs('/plugins/inetis/richeditorsnippets/assets/js/froala.snippets.plugin.js');
+        });
+
+        // Register components from cache for AJAX handlers
+        Event::listen('cms.page.initComponents', function($controller, $page) {
+            SnippetLoader::restoreComponentSnippetsFromCache($controller, $page);
         });
     }
 

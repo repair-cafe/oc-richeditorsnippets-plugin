@@ -77,8 +77,8 @@ class Plugin extends PluginBase
     {
         return [
             'filters' => [
-                'parseSnippets' => function($html) {
-                    return SnippetParser::parse($html);
+                'parseSnippets' => function($html, $params = []) {
+                    return SnippetParser::parse($html, $params);
                 }
             ]
         ];

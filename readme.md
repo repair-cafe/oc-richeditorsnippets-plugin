@@ -40,6 +40,15 @@ Option 2 (wrap in filter)
 {% endfilter %}
 ```
 
+Note this method is useful if you are including a third party component that will output richeditors but you don't want to override its partial.
+
+For example if you are using a richeditor with Rainlab.Blog, you may want to include the component as follow in your CMS page:
+```
+{% filter parseSnippets %}
+    {% component 'blogPost' %}
+{% endfilter %}
+```
+
 <a name="fields"></a>
 ## Example usage in fields.yaml
 

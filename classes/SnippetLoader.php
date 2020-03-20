@@ -24,7 +24,7 @@ class SnippetLoader
 		$controller = CmsController::getController();
 
 		// Make an unique alias for this snippet based on its name and parameters
-		$snippetInfo['code'] = uniqid($snippetInfo['code'] . '-' . md5(serialize($snippetInfo['properties'])) . '-');
+		$snippetInfo['code'] = uniqid($snippetInfo['code'] . '_' . md5(serialize($snippetInfo['properties'])) . '_');
 
 		self::attachComponentSnippetToController($snippetInfo, $controller, true);
 		self::cacheSnippet($snippetInfo['code'], $snippetInfo);

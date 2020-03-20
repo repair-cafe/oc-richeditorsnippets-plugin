@@ -1,12 +1,15 @@
 <?php namespace Inetis\RicheditorSnippets\Classes;
 
+use ApplicationException;
 use Cache;
+use Cms\Classes\CmsException;
 use Config;
 use Event;
 use Cms\Classes\Controller as CmsController;
 use Cms\Classes\Theme;
 use Cms\Classes\ComponentManager;
 use RainLab\Pages\Classes\SnippetManager;
+use SystemException;
 
 class SnippetLoader
 {
@@ -17,6 +20,8 @@ class SnippetLoader
 	 *
 	 * @param array $snippetInfo	The info of the snippet to register
 	 * @return string				The generated unique alias for this snippet
+     * @throws SystemException
+     * @throws CmsException
 	 */
 	public static function registerComponentSnippet($snippetInfo)
 	{
@@ -37,6 +42,7 @@ class SnippetLoader
 	 *
 	 * @param array $snippetInfo	The info of the snippet to register
 	 * @return string				The generated unique alias for this snippet
+	 * @throws ApplicationException
 	 */
 	public static function registerPartialSnippet($snippetInfo)
 	{
@@ -77,7 +83,10 @@ class SnippetLoader
 		$componentSnippets = self::fetchCachedSnippets();
 
         foreach ($componentSnippets as $componentInfo) {
-            self::attachComponentSnippetToController($componentInfo, $cmsController);
+            try {
+                self::attachComponentSnippetToController($componentInfo, $cmsController);
+            } catch (\Exception $e) {
+            }
         }
 	}
 
@@ -94,6 +103,8 @@ class SnippetLoader
 	 * @param array $componentInfo
 	 * @param CmsController $controller
 	 * @param bool $triggerRun			Should the run events of the component lifecycle be triggered?
+	 * @throws SystemException
+	 * @throws CmsException
 	 */
 	protected static function attachComponentSnippetToController($componentInfo, CmsController $controller, $triggerRun = false)
 	{

@@ -5,3 +5,7 @@
     - Fixes for October >= 420
     - Move to inetis namespace
 2.1.0: Add support for component-based snippets with AJAX handlers
+2.1.1:
+    - Fix AJAX handlers on component-based snippets
+    - Fix snippets in richeditors initialized on page load
+    - Add ability to pass additional parameters

@@ -4,6 +4,7 @@
 - [Example usage for Rainlab Syntax Fields](#syntaxFields)
 - [Example usage for Rainlab Pages Content Blocks](#contentBlocks)
 - [Example usage in fields.yaml](#fields)
+- [Passing extra parameters](#extraParameters)
 
 <a name="introduction"></a>
 ## Introduction
@@ -39,17 +40,40 @@ Option 2 (wrap in filter)
 {% endfilter %}
 ```
 
+Note this method is useful if you are including a third party component that will output richeditors but you don't want to override its partial.
+
+For example if you are using a richeditor with Rainlab.Blog, you may want to include the component as follow in your CMS page:
+```
+{% filter parseSnippets %}
+    {% component 'blogPost' %}
+{% endfilter %}
+```
+
 <a name="fields"></a>
 ## Example usage in fields.yaml
 
 If you do not set `toolbarButtons` you will not need to add `snippets` to the list. Please see example below when customization is required.
 
-```
+```yaml
 html_content:
     type: richeditor
     toolbarButtons: bold|italic|snippets
     size: huge
 ```
+
+<a name="extraParameters"></a>
+## Pass extra parameters
+If needed, you can pass extra parameters to your snippets from your theme like this:
+```
+{{ text | parseSnippets({context: 'foo'}) }}
+```
+```
+{% filter parseSnippets({context: 'foo'}) %}
+    {richeditor name="text" label="Text"}{/richeditor}
+{% endfilter %}
+```
+
+You will then be able to access `context` as if it was a component property using `$this->property('context')`.
 
 ## Contributors
 - Tough Developer: creator of the [original version](https://github.com/toughdeveloper/oc-richeditorsnippets-plugin)

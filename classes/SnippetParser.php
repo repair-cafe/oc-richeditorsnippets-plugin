@@ -6,10 +6,13 @@ This file is mostly copied from RainLab\Pages\Classes\Snippet
 
 ***/
 
+use ApplicationException;
+use Cms\Classes\CmsException;
 use RainLab\Pages\Classes\Snippet;
 use RainLab\Pages\Classes\SnippetManager;
 use Cms\Classes\Controller as CmsController;
 use Cms\Classes\Theme;
+use SystemException;
 
 class SnippetParser
 {
@@ -17,9 +20,13 @@ class SnippetParser
      * Take a richeditor markup and run snippets contained inside.
      *
      * @param string $markup
+     * @param array $params
      * @return string
+     * @throws ApplicationException
+     * @throws CmsException
+     * @throws SystemException
      */
-    public static function parse($markup)
+    public static function parse($markup, $params = [])
     {
         $map = self::extractSnippetsFromMarkup($markup);
         $controller = CmsController::getController();
@@ -30,12 +37,12 @@ class SnippetParser
             if (isset($snippetInfo['component'])) {
                 // The snippet is a component registered as a snippet
                 $snippetAlias = SnippetLoader::registerComponentSnippet($snippetInfo);
-                $generatedMarkup = $controller->renderComponent($snippetAlias);
+                $generatedMarkup = $controller->renderComponent($snippetAlias, $params);
             }
             else {
                 // The snippet is a partial
                 $partialName = SnippetLoader::registerPartialSnippet($snippetInfo);
-                $generatedMarkup = $controller->renderPartial($partialName, $snippetInfo['properties']);
+                $generatedMarkup = $controller->renderPartial($partialName, array_merge($params, $snippetInfo['properties']));
             }
 
             $pattern = preg_quote($snippetDeclaration);
@@ -95,7 +102,7 @@ class SnippetParser
     }
 
     /**
-     * Apples default property values and fixes property names.
+     * Applies default property values and fixes property names.
      *
      * As snippet properties are defined with data attributes, they are lower case, whereas
      * real property names are case sensitive. This method finds original property names defined

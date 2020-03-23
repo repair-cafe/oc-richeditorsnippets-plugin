@@ -111,15 +111,20 @@
         } while (snippetFound)
 
         return updatedCode
-    }
+    };
 
+
+    /**
+     * Because the pages-snippets.js is injected after the richeditor script, it will register its
+     * initialization hooks too late. Here we need to force initialization in order to work with forms
+     * that are displayed on page load (i.e. Rainlab Blog).
+     */
+    $(document).ready(function() {
+        var $editor = $('[data-control="richeditor"]');
+
+        if ($.oc.pagesPage && !window.location.pathname.includes('rainlab/pages')) {
+            $.oc.pagesPage.snippetManager.initSnippets($editor);
+        }
+    });
 
 })(jQuery);
-
-$(window).on('load', function() {
-    var $editor = $('[data-control="richeditor"]');
-
-    if ($.oc.pagesPage && !window.location.pathname.includes('rainlab/pages')) {
-        $.oc.pagesPage.snippetManager.initSnippets($editor);
-    }
-});

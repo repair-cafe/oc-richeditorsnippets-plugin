@@ -1,6 +1,7 @@
 <?php namespace Inetis\RicheditorSnippets;
 
 use Event;
+use Input;
 use System\Classes\PluginBase;
 use Backend\FormWidgets\RichEditor;
 use Backend\Classes\Controller;
@@ -69,7 +70,16 @@ class Plugin extends PluginBase
 
         // Register components from cache for AJAX handlers
         Event::listen('cms.page.initComponents', function($controller, $page) {
-            SnippetLoader::restoreComponentSnippetsFromCache($controller, $page);
+            if (Input::ajax()) {
+                SnippetLoader::restoreComponentSnippetsFromCache($controller);
+            }
+        });
+
+        // Save the snippets loaded in this page for use inside subsequent AJAX calls
+        Event::listen('cms.page.postprocess', function() {
+            if (!Input::ajax()) {
+                SnippetLoader::saveCachedSnippets();
+            }
         });
     }
 

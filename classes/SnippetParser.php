@@ -49,8 +49,6 @@ class SnippetParser
             $markup = mb_ereg_replace($pattern, $generatedMarkup, $markup);
         }
 
-        SnippetLoader::saveCachedSnippets();
-
         return $markup;
     }
 

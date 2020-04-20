@@ -9,3 +9,7 @@
     - Fix AJAX handlers on component-based snippets
     - Fix snippets in richeditors initialized on page load
     - Add ability to pass additional parameters
+2.1.2:
+    - Refactor AJAX handlers caching
+    - Fix "AJAX handler not found" errors when requesting handler 15 minutes after page load
+    - Handlers cache is no more shared between users

@@ -15,3 +15,6 @@
     - Handlers cache is no more shared between users
 2.1.3:
     - Fix broken error message when a snippet is not found - Thanks to Tobias Kündig
+2.1.4:
+    - Fix duplicate stuff on RainLab.Pages (open page twice, add snippet twice, etc.)
+    - '!!! This update fixes a compatibility issue with RainLab.Pages >= v1.3.5. You should make sure you are using the latest version of RainLab.Pages'

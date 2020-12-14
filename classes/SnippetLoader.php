@@ -5,6 +5,7 @@ use Cache;
 use Carbon\Carbon;
 use Cms\Classes\CmsException;
 use Cms\Classes\Controller as CmsController;
+use Cms\Classes\Page as CmsPage;
 use Cms\Classes\Theme;
 use Cms\Classes\ComponentManager;
 use RainLab\Pages\Classes\SnippetManager;
@@ -59,11 +60,13 @@ class SnippetLoader
     /**
      * Save to the cache the component snippets loaded for this page.
      * Should be called once after all snippets are loaded to avoid multiple serializations.
+     *
+     * @param CmsPage $page             The CMS Page to which the cache should be attached
      */
-    public static function saveCachedSnippets()
+    public static function saveCachedSnippets(CmsPage $page)
     {
         Cache::put(
-            self::getMapCacheKey(),
+            self::getMapCacheKey($page),
             serialize(self::$pageSnippetsCache),
             Carbon::now()->addDay()
         );
@@ -74,10 +77,11 @@ class SnippetLoader
      * This make AJAX handlers of these components available.
      *
      * @param CmsController $cmsController
+     * @param CmsPage $page                 The CMS page for which to load the cache
      */
-    public static function restoreComponentSnippetsFromCache($cmsController)
+    public static function restoreComponentSnippetsFromCache($cmsController, CmsPage $page)
     {
-        $componentSnippets = self::fetchCachedSnippets();
+        $componentSnippets = self::fetchCachedSnippets($page);
 
         foreach ($componentSnippets as $componentInfo) {
             try {
@@ -146,10 +150,12 @@ class SnippetLoader
 
     /**
      * Get cached component snippets from the cache.
+     *
+     * @param CmsPage $page         The CMS page for which to load the cache
      */
-    protected static function fetchCachedSnippets()
+    protected static function fetchCachedSnippets(CmsPage $page)
     {
-        $cache = @unserialize(Cache::get(self::getMapCacheKey(), serialize([])));
+        $cache = @unserialize(Cache::get(self::getMapCacheKey($page), serialize([])));
 
         return is_array($cache) ? $cache : [];
     }
@@ -157,12 +163,12 @@ class SnippetLoader
     /**
      * Get a cache key for the current page and the current user.
      *
+     * @param CmsPage $page         The CMS page for which to load the cache
      * @return string
      */
-    protected static function getMapCacheKey()
+    protected static function getMapCacheKey(CmsPage $page)
     {
         $theme = Theme::getActiveTheme();
-        $page = CmsController::getController()->getPage();
 
         return 'dynamic-snippet-map-' . md5($theme->getPath() . $page['url'] . Session::getId());
     }

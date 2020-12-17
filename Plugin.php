@@ -69,16 +69,16 @@ class Plugin extends PluginBase
         });
 
         // Register components from cache for AJAX handlers
-        Event::listen('cms.page.initComponents', function($controller, $page) {
+        Event::listen('cms.page.initComponents', function($controller, $page, $layout) {
             if (Input::ajax()) {
-                SnippetLoader::restoreComponentSnippetsFromCache($controller);
+                SnippetLoader::restoreComponentSnippetsFromCache($controller, $page);
             }
         });
 
         // Save the snippets loaded in this page for use inside subsequent AJAX calls
-        Event::listen('cms.page.postprocess', function() {
+        Event::listen('cms.page.postprocess', function($controller, $url, $page, $dataHolder) {
             if (!Input::ajax()) {
-                SnippetLoader::saveCachedSnippets();
+                SnippetLoader::saveCachedSnippets($page);
             }
         });
     }
